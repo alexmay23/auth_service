@@ -1,0 +1,5 @@
+asynchttplib==0.2.1
+click
+passlib
+phonenumbers
+PyJWT
