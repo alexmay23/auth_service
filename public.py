@@ -1,8 +1,9 @@
-from service.resources import LoginResource
+from service.resources import LoginResource, RegisterResource
 
 
-def make_public_api(service):
-    service.public_api.add_resource('/login', LoginResource())
+def make_public_api(api):
+    api.add_resource('/login', LoginResource())
+    api.add_resource('/register', RegisterResource())
 
 
 

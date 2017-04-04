@@ -1,8 +1,7 @@
 import asyncio
 
-from aiohttp import web
-from asynclib.http.parser import use_schema, throwable
-from webargs.aiohttpparser import use_args
+from asynclib.http.marshall import dump
+from asynclib.http.parser import parse_args
 
 from service.facade import UserFacade
 from service.parser import Identity, Password
@@ -14,12 +13,20 @@ class BaseUserResource(object):
         self.facade = UserFacade()
 
 
+auth_args = {'identity': Identity(required=True), 'password': Password(required=True)}
+
+
 class LoginResource(BaseUserResource):
 
-    @asyncio.coroutine
-    @throwable
-    @use_args({'identity': Identity(required=True), 'password': Password(required=True)})
-    @use_schema(AuthSchema)
-    def post(self, request, args):
-        result = yield from self.facade.login(args['identity'], args['password'])
-        return result
+    async def post(self, request):
+        args = await parse_args(await request.json(), arg_map=auth_args)
+        user, token = await self.facade.login(args['identity'], args['password'])
+        return dump(AuthSchema, {'user': user, 'token': token})
+
+
+class RegisterResource(BaseUserResource):
+
+    async def post(self, request):
+        args = await parse_args(await request.json(), arg_map=auth_args)
+        user, token = await self.facade.register(args['identity'], args['password'])
+        return dump(AuthSchema, {'user': user, 'token': token})

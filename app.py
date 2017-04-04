@@ -13,7 +13,7 @@ def commands():
 
 @commands.command()
 def run_private_api():
-    make_private_api(service)
+    make_private_api(service.private_api)
     service.run_private_api()
 
 
@@ -21,7 +21,7 @@ def run_private_api():
 @click.option('--host', default=config.get('HOST', '127.0.0.1'))
 @click.option('--port', default=config.get('PORT', 5000))
 def run_public_api(host, port):
-    make_public_api(service)
+    make_public_api(service.public_api)
     service.run_public_api(host, port)
 
 

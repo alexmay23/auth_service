@@ -1,7 +1,6 @@
-from asynclib.http.parser import Nested, MongoId
-from asynclib.http.parser import Schema
-
-from service.parser import fields
+from asynclib.http.marshall import Nested, MongoId
+from asynclib.http.marshall import Schema
+from asynclib.http.marshall import fields
 
 
 class UserIdentitySchema(Schema):
