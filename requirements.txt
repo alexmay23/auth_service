@@ -1,4 +1,4 @@
-asynchttplib==0.2.9
+asynchttplib==0.3.0
 click
 passlib
 phonenumbers
