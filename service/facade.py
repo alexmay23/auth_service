@@ -28,6 +28,8 @@ class UserFacade(object):
         return user, self.get_token(user)
 
     async def login_by_jwt(self, token):
+        if token is None:
+            raise WrongTokenError()
         payload = jwt.decode(token, verify=False)
         result = await self.user_db.get_by_id(ObjectId(payload['_id']))
         if result is None:
@@ -131,16 +133,14 @@ class UserFacade(object):
         await self.send_value_to_identity(identity, identity_type_message_map, 'Email Verification')
 
     async def send_value_to_identity(self, identity, identity_type_message_map, subject):
-        client = AMQPClient('transport')
-        await client.connect()
-        if identity['type'] == define.USER_IDENTITY_TYPE.email:
-            client.publish('mail', [{'recipient': identity['value'],
-                                     'message': identity_type_message_map[define.USER_IDENTITY_TYPE.email],
-                                     'subject': subject}])
-        else:
-            client.publish('sms', [{'recipient': identity['value'],
-                                    'message': identity_type_message_map[define.USER_IDENTITY_TYPE.phone]}])
-        await client.close()
+        async with AMQPClient('transport') as client:
+            if identity['type'] == define.USER_IDENTITY_TYPE.email:
+                client.publish('mail', [{'recipient': identity['value'],
+                                         'message': identity_type_message_map[define.USER_IDENTITY_TYPE.email],
+                                         'subject': subject}])
+            else:
+                client.publish('sms', [{'recipient': identity['value'],
+                                        'message': identity_type_message_map[define.USER_IDENTITY_TYPE.phone]}])
 
     async def update_user(self, user, args):
         await self.user_db.update(user['_id'], **args)

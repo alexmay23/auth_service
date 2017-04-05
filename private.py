@@ -1,8 +1,9 @@
-from service.amqp import auth_by_token
+from service.facade import UserFacade
 
 
-def make_private_api(aoi):
-    api.private_api.register_endpoint('auth_by_token', auth_by_token)
+def make_private_api(api):
+    user_facade = UserFacade()
+    api.register_endpoint('login_by_jwt', user_facade.login_by_jwt)
 
 
 
